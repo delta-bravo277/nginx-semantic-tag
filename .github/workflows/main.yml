@@ -30,11 +30,13 @@ jobs:
     - name: Print tag
       id: determine-tag
       env:
-        GET: ${{ steps.get-tag.outputs.new }}
+        GET: ${{ steps.get-tag.outputs.tag }}
         NEW_GET: ${{ steps.get-tag.outputs.new_tag }}
+        PART: ${{ steps.get-tag.outputs.part }}
       run: |
         echo $GET
         echo $NEW_GET
+        echo $PART
       
     # - name: Configure AWS credentials
     #   uses: aws-actions/configure-aws-credentials@v1
