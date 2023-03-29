@@ -37,15 +37,15 @@ jobs:
         echo $NEW_TAG
         echo $PART
 
-    - name: Check Tag Part
-      if: ${{ steps.get-tag.outputs.part == '0' || steps.get-tag.outputs.part == '' }}
-      run: |
+    # - name: Check Tag Part
+    #   if: ${{ steps.get-tag.outputs.part == '0' || steps.get-tag.outputs.part == '' }}
+    #   run: |
         
-        echo "Tag part is 0 or null. Skipping remaining steps."
-        exit 0
+    #     echo "Tag part is 0 or null. Skipping remaining steps."
+    #     exit 0
   
     - name: Configure AWS credentials 
-      if: 
+      if: ${{ steps.get-tag.outputs.part == '0' || steps.get-tag.outputs.part == '' }}
       uses: aws-actions/configure-aws-credentials@v1
       with:
         aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
