@@ -25,12 +25,8 @@ jobs:
         REPO_OWNER: delta-bravo277
         WITH_V: true
         DEFAULT_BUMP: none
-        DRY_RUN: true
-      run: |
-          echo $part
-          echo $new_tag
-          echo $tag
-          
+        DRY_RUN: tag 
+
         
     - name: Print tag
       id: determine-tag
