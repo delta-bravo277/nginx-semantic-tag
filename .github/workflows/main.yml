@@ -34,7 +34,7 @@ jobs:
         PART: ${{ steps.get-tag.outputs.part }}
       run: |
         echo $NEW_TAG
-        if [[ $PART == '' ]] then 
+        if [[ $PART == '' ]]; then 
           exit 0
         fi
 
