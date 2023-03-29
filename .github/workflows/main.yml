@@ -34,7 +34,7 @@ jobs:
         GET: ${{ steps.get-tag.outputs.tag }}
         NEW_GET: ${{ steps.get-tag.outputs.new_tag }}
         NEW: ${{ steps.get-tag.outputs.new }}
-        PART: ${{ steps.get-tag.outputs.new }}
+        PART: ${{ steps.get-tag.outputs.part }}
       run: |
         echo $GET
         echo $NEW_GET
