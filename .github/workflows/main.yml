@@ -30,11 +30,11 @@ jobs:
     - name: Print tag
       id: determine-tag
       run: |
-        NEW_TAG=$(git describe --abbrev=0 --tags || git tag)
+        NEW_TAG=$(git describe --abbrev=0 --tags)
         echo "::set-output name=new_tag::$NEW_TAG"
         echo $NEW_TAG
       
-      if: ${{ steps.determine-tag.outputs.new_tag != 'v0.0.0' }}
+      if: ${{ steps.determine-tag.outputs.new_tag != $(git describe --abbrev=0 --tags $(git rev-list --tags --skip=1 --max-count=1)) }}
     - name: Configure AWS credentials
       uses: aws-actions/configure-aws-credentials@v1
       with:
