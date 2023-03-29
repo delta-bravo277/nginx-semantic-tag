@@ -25,6 +25,7 @@ jobs:
         REPO_OWNER: delta-bravo277
         WITH_V: true
         DEFAULT_BUMP: none
+        DRY_RUN: true
           
         
     - name: Print tag
@@ -35,53 +36,53 @@ jobs:
         echo $NEW_TAG
         if $NEW_TAG == $(git tag | tail -1)
 
-    - name: Condition Check
-      env: 
-        NEW_TAG: ${{ steps.determine-tag.outputs.new_tag }}
-      run: |
-        if ${{ NEW_TAG != (git tag | tail -1) }}
-        exit 1
+    # - name: Condition Check
+    #   env: 
+    #     NEW_TAG: ${{ steps.determine-tag.outputs.new_tag }}
+    #   run: |
+    #     if ${{ NEW_TAG !=  }}
+    #     exit 1
       
-    - name: Configure AWS credentials
-      uses: aws-actions/configure-aws-credentials@v1
-      with:
-        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-        aws-region: ${{ env.AWS_REGION }}
+    # - name: Configure AWS credentials
+    #   uses: aws-actions/configure-aws-credentials@v1
+    #   with:
+    #     aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+    #     aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+    #     aws-region: ${{ env.AWS_REGION }}
   
-    - name: Login to Amazon ECR   #To get ECR registry name
-      id: login-ecr
-      uses: aws-actions/amazon-ecr-login@v1
+    # - name: Login to Amazon ECR   #To get ECR registry name
+    #   id: login-ecr
+    #   uses: aws-actions/amazon-ecr-login@v1
 
 
-    - name: Build, TAG and push NGINX image to Amazon ECR
-      id: build-image
-      env:
-        REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-        REPOSITORY: ga-ecs
-        NEW_TAG: ${{ steps.determine-tag.outputs.new_tag }}
-      run: |
-        docker build -t $REGISTRY/$REPOSITORY:$NEW_TAG .
-        docker push $REGISTRY/$REPOSITORY:$NEW_TAG
-        echo "$REGISTRY/$REPOSITORY:$NEW_TAG"
-        echo "image=$REGISTRY/$REPOSITORY:$NEW_TAG" >> $GITHUB_OUTPUT
-        echo $image
+    # - name: Build, TAG and push NGINX image to Amazon ECR
+    #   id: build-image
+    #   env:
+    #     REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+    #     REPOSITORY: ga-ecs
+    #     NEW_TAG: ${{ steps.determine-tag.outputs.new_tag }}
+    #   run: |
+    #     docker build -t $REGISTRY/$REPOSITORY:$NEW_TAG .
+    #     docker push $REGISTRY/$REPOSITORY:$NEW_TAG
+    #     echo "$REGISTRY/$REPOSITORY:$NEW_TAG"
+    #     echo "image=$REGISTRY/$REPOSITORY:$NEW_TAG" >> $GITHUB_OUTPUT
+    #     echo $image
 
-    - name: Updating Amazon ECS task definition
-      id: task-def
-      uses: aws-actions/amazon-ecs-render-task-definition@v1
-      with:
-        task-definition: ${{ env.ECS_TASK_DEFINITION }}
-        container-name: ${{ env.CONTAINER_NAME }}
-        image: ${{ steps.build-image.outputs.image }}
+    # - name: Updating Amazon ECS task definition
+    #   id: task-def
+    #   uses: aws-actions/amazon-ecs-render-task-definition@v1
+    #   with:
+    #     task-definition: ${{ env.ECS_TASK_DEFINITION }}
+    #     container-name: ${{ env.CONTAINER_NAME }}
+    #     image: ${{ steps.build-image.outputs.image }}
 
-    - name: Deploy Amazon ECS task definition
-      uses: aws-actions/amazon-ecs-deploy-task-definition@v1
-      with:
-        task-definition: ${{ steps.task-def.outputs.task-definition }}
-        service: ${{ env.ECS_SERVICE }}
-        cluster: ${{ env.ECS_CLUSTER }}
-        wait-for-service-stability: true
+    # - name: Deploy Amazon ECS task definition
+    #   uses: aws-actions/amazon-ecs-deploy-task-definition@v1
+    #   with:
+    #     task-definition: ${{ steps.task-def.outputs.task-definition }}
+    #     service: ${{ env.ECS_SERVICE }}
+    #     cluster: ${{ env.ECS_CLUSTER }}
+    #     wait-for-service-stability: true
  
           
 
