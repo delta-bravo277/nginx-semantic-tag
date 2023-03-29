@@ -1,0 +1,74 @@
+name: Rollback
+
+on:
+  workflow_dispatch: 
+  # push:
+  #  tags:
+  #    - "*"
+
+env:
+  AWS_REGION: ap-south-1  
+  ECR_REPOSITORY: ga-ecs           
+  ECS_SERVICE: nginx-service                
+  ECS_CLUSTER: github-action-ecs                 
+  ECS_TASK_DEFINITION: .github/workflows/task-definition-nginx.json                                     
+  CONTAINER_NAME: nginx-container         
+                                            
+jobs:
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v3
+      with:
+          fetch-depth: 0
+
+    - name: Determine previous version number
+      id: determine-prev-version
+      run: |
+         echo "PREV_TAG=$(git describe --abbrev=0 --tags $(git rev-list --tags --skip=1 --max-count=1))" >> $GITHUB_OUTPUT
+    
+    - name: Configure AWS credentials
+      uses: aws-actions/configure-aws-credentials@v1
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-region: ${{ env.AWS_REGION }}
+  
+    - name: Login to Amazon ECR   #To get ECR registry name
+      id: login-ecr
+      uses: aws-actions/amazon-ecr-login@v1
+
+    - name: Get previous NGINX image from Amazon ECR
+      id: get-image
+      env:
+        REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+        REPOSITORY: ga-ecs
+        PREV_TAG: ${{ steps.determine-prev-version.outputs.prev_tag }}
+      run: |
+        echo "image=$REGISTRY/$REPOSITORY:$PREV_TAG" >> $GITHUB_OUTPUT
+        echo $GITHUB TOKEN
+
+    - name: Print
+      env:
+        image: ${{ steps.get-image.outputs.image }}
+      run: |
+          echo $image
+      
+    - name: Updating Amazon ECS task definition
+      id: task-def
+      uses: aws-actions/amazon-ecs-render-task-definition@v1
+      with:
+        task-definition: ${{ env.ECS_TASK_DEFINITION }}
+        container-name: ${{ env.CONTAINER_NAME }}
+        image: ${{ steps.get-image.outputs.image }}
+
+    - name: Deploy Amazon ECS task definition
+      uses: aws-actions/amazon-ecs-deploy-task-definition@v1
+      with:
+        task-definition: ${{ steps.task-def.outputs.task-definition }}
+        service: ${{ env.ECS_SERVICE }}
+        cluster: ${{ env.ECS_CLUSTER }}
+        wait-for-service-stability: true

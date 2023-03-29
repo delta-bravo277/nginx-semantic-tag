@@ -1,0 +1,84 @@
+name: Build , TAG and Push NGINX Image to ECR
+
+on:
+  # workflow_dispatch: 
+  push:
+   tags:
+     - "*"
+
+env:
+  AWS_REGION: ap-south-1  
+  ECR_REPOSITORY: ga-ecs           
+  ECS_SERVICE: nginx-service                
+  ECS_CLUSTER: github-action-ecs                 
+  ECS_TASK_DEFINITION: .github/workflows/task-definition-nginx.json                                     
+  CONTAINER_NAME: nginx-container         
+                                            
+jobs:
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v3
+      with:
+          fetch-depth: 0
+
+    - name: Determine version number
+      id: determine-version
+      run: |
+          INIT_TAG=$(git tag)
+          if [[ "$INIT_TAG" == "" ]]; then
+            NEW_TAG="v1.0.0"
+          else
+            LATEST_TAG=$(git describe --abbrev=0 --tags)
+            SEMVER_REGEX="^v([0-9]+)\.([0-9]+)\.([0-9]+)$"
+            if [[ "$LATEST_TAG" =~ $SEMVER_REGEX ]]; then
+              MAJOR="${BASH_REMATCH[1]}"
+              MINOR="${BASH_REMATCH[2]}"
+              PATCH="${BASH_REMATCH[3]}"
+              NEW_TAG="v$MAJOR.$MINOR.$PATCH"
+            fi
+          fi
+          echo "::set-output name=new_tag::$NEW_TAG"
+          echo $NEW_TAG
+  
+    - name: Configure AWS credentials
+      uses: aws-actions/configure-aws-credentials@v1
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-region: ${{ env.AWS_REGION }}
+  
+    - name: Login to Amazon ECR   #To get ECR registry name
+      id: login-ecr
+      uses: aws-actions/amazon-ecr-login@v1
+
+    - name: Build, TAG and push NGINX image to Amazon ECR
+      id: build-image
+      env:
+        REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+        REPOSITORY: ga-ecs
+        NEW_TAG: ${{ steps.determine-version.outputs.new_tag }}
+      run: |
+        docker build -t $REGISTRY/$REPOSITORY:$NEW_TAG .
+        docker push $REGISTRY/$REPOSITORY:$NEW_TAG
+        echo "$REGISTRY/$REPOSITORY:$NEW_TAG"
+         echo "image=$REGISTRY/$REPOSITORY:$NEW_TAG" >> $GITHUB_OUTPUT
+
+    - name: Updating Amazon ECS task definition
+      id: task-def
+      uses: aws-actions/amazon-ecs-render-task-definition@v1
+      with:
+        task-definition: ${{ env.ECS_TASK_DEFINITION }}
+        container-name: ${{ env.CONTAINER_NAME }}
+        image: ${{ steps.build-image.outputs.image }}
+
+    - name: Deploy Amazon ECS task definition
+      uses: aws-actions/amazon-ecs-deploy-task-definition@v1
+      with:
+        task-definition: ${{ steps.task-def.outputs.task-definition }}
+        service: ${{ env.ECS_SERVICE }}
+        cluster: ${{ env.ECS_CLUSTER }}
+        wait-for-service-stability: true

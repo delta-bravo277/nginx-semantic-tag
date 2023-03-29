@@ -1,0 +1,26 @@
+# example 1: on push to master
+name: Bump version
+on:
+  push:
+    branches:
+      - main
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Bump version and push tag
+      id: get-tag
+      uses: anothrNick/github-tag-action@master # Don't use @master unless you're happy to test the latest version
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        REPO_OWNER: delta-bravo277
+        WITH_V: true
+        
+    - name: Print tag
+      run: |
+        LATEST_TAG=$(git describe --abbrev=0 --tags)
+        echo $LATEST_TAG  
+          
+
