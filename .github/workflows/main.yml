@@ -34,7 +34,7 @@ jobs:
         echo "::set-output name=new_tag::$NEW_TAG"
         echo $NEW_TAG
       
-      if: $NEW_TAG != 'v0.0.0'
+      if: ${{ steps.determine-tag.outputs.new_tag != 'v0.0.0' }}
     - name: Configure AWS credentials
       uses: aws-actions/configure-aws-credentials@v1
       with:
