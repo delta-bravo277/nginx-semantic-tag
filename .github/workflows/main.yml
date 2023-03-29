@@ -26,6 +26,10 @@ jobs:
         WITH_V: true
         DEFAULT_BUMP: none
         DRY_RUN: true
+      run: |
+          echo $part
+          echo $new_tag
+          echo $tag
           
         
     - name: Print tag
@@ -34,7 +38,6 @@ jobs:
         NEW_TAG=$(git tag | tail -1)
         echo "::set-output name=new_tag::$NEW_TAG"
         echo $NEW_TAG
-        if $NEW_TAG == $(git tag | tail -1)
 
     # - name: Condition Check
     #   env: 
