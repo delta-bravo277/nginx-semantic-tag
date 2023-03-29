@@ -32,11 +32,10 @@ jobs:
       env:
         NEW_TAG: ${{ steps.get-tag.outputs.tag }}
         PART: ${{ steps.get-tag.outputs.part }}
-      if: ${{ env.PART == '' }}
+      if: ${{ env.PART == '' }}  == false
       run: |
         echo $GET
         echo $PART
-        exit 1
 
     - name: Configure AWS credentials
       uses: aws-actions/configure-aws-credentials@v1
