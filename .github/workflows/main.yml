@@ -3,6 +3,14 @@ on:
   push:
     branches:
       - main
+env:
+    AWS_REGION: ap-south-1  
+    ECR_REPOSITORY: ga-ecs           
+    ECS_SERVICE: nginx-service                
+    ECS_CLUSTER: github-action-ecs                 
+    ECS_TASK_DEFINITION: .github/workflows/task-definition-nginx.json                                     
+    CONTAINER_NAME: nginx-container  
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -20,8 +28,37 @@ jobs:
           
         
     - name: Print tag
+      id: determine-tag
       run: |
-        LATEST_TAG=$(git describe --abbrev=0 --tags || git tag)
-        echo $LATEST_TAG  
+        NEW_TAG=$(git describe --abbrev=0 --tags || git tag)
+        echo "::set-output name=new_tag::$NEW_TAG"
+        echo $NEW_TAG 
+
+    - name: Configure AWS credentials
+      uses: aws-actions/configure-aws-credentials@v1
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-region: ${{ env.AWS_REGION }}
+  
+    - name: Login to Amazon ECR   #To get ECR registry name
+      id: login-ecr
+      uses: aws-actions/amazon-ecr-login@v1
+
+
+    - name: Build, TAG and push NGINX image to Amazon ECR
+      id: build-image
+      env:
+        REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+        REPOSITORY: ga-ecs
+        NEW_TAG: ${{ steps.determine-tag.outputs.new_tag }}
+      run: |
+        docker build -t $REGISTRY/$REPOSITORY:$NEW_TAG .
+        docker push $REGISTRY/$REPOSITORY:$NEW_TAG
+        echo "$REGISTRY/$REPOSITORY:$NEW_TAG"
+        echo "image=$REGISTRY/$REPOSITORY:$NEW_TAG" >> $GITHUB_OUTPUT
+        echo $image
+
+ 
           
 
