@@ -1,18 +1,15 @@
 name: Rollback
 
 on:
-  workflow_dispatch: 
-  # push:
-  #  tags:
-  #    - "*"
+  workflow_dispatch
 
 env:
   AWS_REGION: ap-south-1  
   ECR_REPOSITORY: ga-ecs           
-  ECS_SERVICE: nginx-service                
+  ECS_SERVICE: nginx-semantic-service                
   ECS_CLUSTER: github-action-ecs                 
   ECS_TASK_DEFINITION: .github/workflows/task-definition-nginx.json                                     
-  CONTAINER_NAME: nginx-container         
+  CONTAINER_NAME: nginx-semantic-container         
                                             
 jobs:
   build:
