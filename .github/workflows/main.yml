@@ -34,8 +34,9 @@ jobs:
         PART: ${{ steps.get-tag.outputs.part }}
       run: |
         echo $NEW_TAG
-        if [[ $PART == '' ]]; then 
-          exit 0
+        if [[ $PART == '' ]]; then
+          echo "out" 
+          break
         fi
 
     - name: Configure AWS credentials
