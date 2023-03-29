@@ -6,10 +6,10 @@ on:
 env:
     AWS_REGION: ap-south-1  
     ECR_REPOSITORY: ga-ecs           
-    ECS_SERVICE: nginx-service                
+    ECS_SERVICE: nginx-semantic-service                
     ECS_CLUSTER: github-action-ecs                 
     ECS_TASK_DEFINITION: .github/workflows/task-definition-nginx.json                                     
-    CONTAINER_NAME: nginx-container  
+    CONTAINER_NAME: nginx-semantic-container  
 
 jobs:
   build:
@@ -59,6 +59,21 @@ jobs:
         echo "image=$REGISTRY/$REPOSITORY:$NEW_TAG" >> $GITHUB_OUTPUT
         echo $image
 
+    - name: Updating Amazon ECS task definition
+      id: task-def
+      uses: aws-actions/amazon-ecs-render-task-definition@v1
+      with:
+        task-definition: ${{ env.ECS_TASK_DEFINITION }}
+        container-name: ${{ env.CONTAINER_NAME }}
+        image: ${{ steps.build-image.outputs.image }}
+
+    - name: Deploy Amazon ECS task definition
+      uses: aws-actions/amazon-ecs-deploy-task-definition@v1
+      with:
+        task-definition: ${{ steps.task-def.outputs.task-definition }}
+        service: ${{ env.ECS_SERVICE }}
+        cluster: ${{ env.ECS_CLUSTER }}
+        wait-for-service-stability: true
  
           
 
