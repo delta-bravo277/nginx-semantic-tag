@@ -40,10 +40,11 @@ jobs:
     - name: Check Tag Part
       if: ${{ steps.get-tag.outputs.part == '0' || steps.get-tag.outputs.part == '' }}
       run: |
+        
         echo "Tag part is 0 or null. Skipping remaining steps."
         exit 0
   
-    - name: Configure AWS credentials -- 
+    - name: Configure AWS credentials 
       if: 
       uses: aws-actions/configure-aws-credentials@v1
       with:
