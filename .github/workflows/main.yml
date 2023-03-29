@@ -34,7 +34,7 @@ jobs:
         echo "::set-output name=new_tag::$NEW_TAG"
         echo $NEW_TAG
       
-      if: ${{ steps.determine-tag.outputs.new_tag }} != $ {{ git describe --abbrev=0 --tags $(git rev-list --tags --skip=1 --max-count=1) }}
+      if: false
     - name: Configure AWS credentials
       uses: aws-actions/configure-aws-credentials@v1
       with:
