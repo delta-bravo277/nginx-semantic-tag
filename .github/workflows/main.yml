@@ -33,7 +33,6 @@ jobs:
       env:
         GET: ${{ steps.get-tag.outputs.new_tag }}
       run: |
-        NEW_TAG=$(git tag | tail -1) >> $GITUHUB_OUTPUT
         echo $GET
 
     # - name: Condition Check
