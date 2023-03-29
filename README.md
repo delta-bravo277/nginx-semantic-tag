@@ -10,12 +10,13 @@
     3. git push origin
     4. git pull
 
-4. to get semantic versioning , commit and push the changes as per below format
+4. to get semantic versioning , commit and push the changes as per below format (should generate docker image)
     1. git commit -m "message  <#version_update> -> 
         1. #patch -> for patch update -> v0.0.X
         2. #minor -> for minor update -> v0.X.0
         3. #major -> for major update -> vX.0.0
 
+null
 
 ======================================================================
 
