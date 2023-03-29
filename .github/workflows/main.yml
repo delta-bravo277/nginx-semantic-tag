@@ -30,7 +30,7 @@ jobs:
     - name: Print tag
       id: determine-tag
       run: |
-        NEW_TAG=$(git describe --abbrev=0 --tags)
+        NEW_TAG=$(git tag | tail -1)
         echo "::set-output name=new_tag::$NEW_TAG"
         echo $NEW_TAG
       
