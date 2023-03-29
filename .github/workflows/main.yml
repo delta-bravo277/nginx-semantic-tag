@@ -26,11 +26,15 @@ jobs:
         WITH_V: true
         DEFAULT_BUMP: none
         DRY_RUN: false
-        GET: ${{ steps.get-tag.outputs.tag }}
+        
+    - name: Print tag
+      id: determine-tag
+      env:
+        GET: ${{ steps.get-tag.outputs.new }}
         NEW_GET: ${{ steps.get-tag.outputs.new_tag }}
-        PART: ${{ steps.get-tag.outputs.part }}
-
-
+      run: |
+        echo $GET
+        echo $NEW_GET
       
     # - name: Configure AWS credentials
     #   uses: aws-actions/configure-aws-credentials@v1
