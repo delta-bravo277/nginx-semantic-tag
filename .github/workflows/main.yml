@@ -31,16 +31,10 @@ jobs:
     - name: Print tag
       id: determine-tag
       env:
-        GET: ${{ steps.get-tag.outputs.new_tag }}
+        GET: ${{ steps.get-tag.outputs.tag }}
+        NEW_GET: ${{ steps.get-tag.outputs.new_tag }}
       run: |
         echo $GET
-
-    # - name: Condition Check
-    #   env: 
-    #     NEW_TAG: ${{ steps.determine-tag.outputs.new_tag }}
-    #   run: |
-    #     if ${{ NEW_TAG !=  }}
-    #     exit 1
       
     # - name: Configure AWS credentials
     #   uses: aws-actions/configure-aws-credentials@v1
