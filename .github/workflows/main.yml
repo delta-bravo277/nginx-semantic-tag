@@ -34,6 +34,7 @@ jobs:
         PART: ${{ steps.get-tag.outputs.part }}
       run: |
         echo $NEW_TAG
+        echo $PART
         
       
     - name: Configure AWS credentials
