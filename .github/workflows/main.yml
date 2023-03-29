@@ -1,5 +1,4 @@
-# example 1: on push to master
-name: Bump version
+name: Build , TAG and Push NGINX Image to ECR
 on:
   push:
     branches:
@@ -10,13 +9,15 @@ jobs:
     steps:
     - uses: actions/checkout@v3
 
-    - name: Bump version and push tag
+    - name: Assign or Get Tag
       id: get-tag
-      uses: anothrNick/github-tag-action@master # Don't use @master unless you're happy to test the latest version
+      uses: anothrNick/github-tag-action@master
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         REPO_OWNER: delta-bravo277
         WITH_V: true
+        DEFAULT_BUMP: none
+          
         
     - name: Print tag
       run: |
