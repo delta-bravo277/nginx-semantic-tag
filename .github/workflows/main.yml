@@ -21,7 +21,7 @@ jobs:
         
     - name: Print tag
       run: |
-        LATEST_TAG=$(git describe --abbrev=0 --tags)
+        LATEST_TAG=$(git describe --abbrev=0 --tags || git tag)
         echo $LATEST_TAG  
           
 
