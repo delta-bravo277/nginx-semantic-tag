@@ -33,8 +33,15 @@ jobs:
         NEW_TAG=$(git tag | tail -1)
         echo "::set-output name=new_tag::$NEW_TAG"
         echo $NEW_TAG
+        if $NEW_TAG == $(git tag | tail -1)
+
+    - name: Condition Check
+      env: 
+        NEW_TAG: ${{ steps.determine-tag.outputs.new_tag }}
+      run: |
+        if $NEW_TAG != $(git tag | tail -1)
+        exit 1
       
-      if: false
     - name: Configure AWS credentials
       uses: aws-actions/configure-aws-credentials@v1
       with:
