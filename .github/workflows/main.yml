@@ -39,7 +39,7 @@ jobs:
       env: 
         NEW_TAG: ${{ steps.determine-tag.outputs.new_tag }}
       run: |
-        if $NEW_TAG != $(git tag | tail -1)
+        if ${{ NEW_TAG != (git tag | tail -1) }}
         exit 1
       
     - name: Configure AWS credentials
