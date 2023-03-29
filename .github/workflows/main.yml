@@ -1,4 +1,4 @@
-name: Build , TAG and Push NGINX Image to ECR
+name: Build , TAG and Push NGINX Image to ECR and deploy to ECS
 on:
   push:
     branches:
