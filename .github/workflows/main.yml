@@ -25,7 +25,7 @@ jobs:
         REPO_OWNER: delta-bravo277
         WITH_V: true
         DEFAULT_BUMP: none
-        DRY_RUN: tag 
+        DRY_RUN: false 
 
         
     - name: Print tag
